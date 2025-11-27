@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from 'sequelize';
 
 export const client = new Sequelize({
   host: process.env.DB_HOST,
@@ -7,6 +7,4 @@ export const client = new Sequelize({
   database: process.env.DB_DATABASE,
   dialect: 'postgres',
   port: process.env.DB_PORT || 5432,
-})
-
-
+});
