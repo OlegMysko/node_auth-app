@@ -1,18 +1,21 @@
-import { jwtService } from "../services/jwt.service.js";
+import { jwtService } from '../services/jwt.service.js';
 
-export const authMiddlewares = (req, res , next) => {
+export const authMiddlewares = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';
-  const [, token] = authorization.split(' ')
+  const [, token] = authorization.split(' ');
 
   if (!authorization || !token) {
-    res.sendStatus(401)
-    return
+    res.sendStatus(401);
+
+    return;
   }
 
-  const userData = jwtService.verify(token)
+  const userData = jwtService.verify(token);
+
   if (!userData) {
-    res.sendStatus(401)
-    return
+    res.sendStatus(401);
+
+    return;
   }
-  next()
-}
+  next();
+};

@@ -1,6 +1,5 @@
-
-import nodemailer from 'nodemailer'
-import 'dotenv/config'
+import nodemailer from 'nodemailer';
+import 'dotenv/config';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -12,24 +11,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export function send({ email, subject, html })
-{
+export function send({ email, subject, html }) {
   return transporter.sendMail({
     to: email,
     subject: subject,
     html: html,
-  })
+  });
 }
 
 function sendActivationEmail(email, token) {
-  const href = `${process.env.CLIENT_HOST}/activate/${encodeURIComponent(email)}/${token}`
+  const href = `${process.env.CLIENT_HOST}/activate/${encodeURIComponent(email)}/${token}`;
   const html = `< h1 > ActivateAcount</h1>
-      <a href= '${href}'>${href} </a>`
+      <a href= '${href}'>${href} </a>`;
+
   return send({
     email,
-    html, subject: 'activate'
-  })
- }
-console.log('email send')
+    html,
+    subject: 'activate',
+  });
+}
 
-export const emailServices = {send, sendActivationEmail}
+export const emailServices = { send, sendActivationEmail };

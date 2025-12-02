@@ -23,6 +23,7 @@ export function createServer() {
   app.get('/', (req, res) => {
     res.send('hello');
   });
-app.use(errorMiddlewares)
+  app.use(errorMiddlewares);
+
   return app;
 }

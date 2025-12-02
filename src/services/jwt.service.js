@@ -1,19 +1,20 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+
 function sign(user) {
-  const token = jwt.sign({ user }, process.env.JWT_KEY)
-  return token
+  const token = jwt.sign({ user }, process.env.JWT_KEY);
+
+  return token;
 }
 
 function verify(token) {
   try {
-    return jwt.verify(token,process.env.JWT_KEY)
+    return jwt.verify(token, process.env.JWT_KEY);
   } catch {
-    return null
+    return null;
   }
-
 }
 export const jwtService = {
   sign,
-  verify
-}
+  verify,
+};

@@ -1,19 +1,36 @@
-import {User} from '../models/user.js'
- function getAllActivated() {
+import { ApiError } from '../exeptions/api.error.js';
+import { User } from '../models/user.js';
+import { emailServices } from '../services/mail.services.js';
+import { v4 as uuidv4 } from 'uuid';
+
+function getAllActivated() {
   return User.findAll({
-    where: { activationToken: null }
-  })
+    where: { activationToken: null },
+  });
 }
 
- function normalize( {id, email} ) {
-  return{id,email}
- }
+function normalize({ id, email }) {
+  return { id, email };
+}
 
 function findByEmail(email) {
-   return User.findOne({where:{email}})
+  return User.findOne({ where: { email } });
 }
- 
+
+async function register(email, password) {
+
+  const activationToken = uuidv4();
+  const existUser = await findByEmail(email)
+  if (existUser) {
+    throw ApiError.badRequest('User already exist',{email:'User already exist'})
+  }
+
+   await User.create({ email, password, activationToken });
+
+  await emailServices.sendActivationEmail(email, activationToken);
+}
 export const userService = {
-  getAllActivated, normalize
-  , findByEmail
-}
+  getAllActivated,
+  normalize,
+  findByEmail,register
+};
