@@ -18,19 +18,22 @@ function findByEmail(email) {
 }
 
 async function register(email, password) {
-
   const activationToken = uuidv4();
-  const existUser = await findByEmail(email)
+  const existUser = await findByEmail(email);
+
   if (existUser) {
-    throw ApiError.badRequest('User already exist',{email:'User already exist'})
+    throw ApiError.badRequest('User already exist', {
+      email: 'User already exist',
+    });
   }
 
-   await User.create({ email, password, activationToken });
+  await User.create({ email, password, activationToken });
 
   await emailServices.sendActivationEmail(email, activationToken);
 }
 export const userService = {
   getAllActivated,
   normalize,
-  findByEmail,register
+  findByEmail,
+  register,
 };

@@ -1,18 +1,18 @@
-import { ApiError } from "../exeptions/api.error.js";
+import { ApiError } from '../exeptions/api.error.js';
 
 export const errorMiddlewares = (error, req, res, next) => {
   if (error instanceof ApiError) {
     res.status(error.status).send({
       message: error.message,
-      error: error.errors
-    })
-return
-}
+      error: error.errors,
+    });
 
-    res.statusCode = 500;
+    return;
+  }
 
-    res.send({
-      message: 'server errorooooooooooooooo',
-    })
+  res.statusCode = 500;
 
+  res.send({
+    message: 'server errorooooooooooooooo',
+  });
 };

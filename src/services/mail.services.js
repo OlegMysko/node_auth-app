@@ -21,7 +21,7 @@ export function send({ email, subject, html }) {
 
 function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${encodeURIComponent(email)}/${token}`;
-  const html = `< h1 > ActivateAcount</h1>
+  const html = `< h1 > ActivateAcount </h1>
       <a href= '${href}'>${href} </a>`;
 
   return send({
