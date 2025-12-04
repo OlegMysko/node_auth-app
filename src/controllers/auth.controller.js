@@ -1,7 +1,7 @@
 import { User } from '../models/user.js';
 
 import { userService } from '../services/user.services.js';
-
+import { tokenService } from '../services/token.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
@@ -39,7 +39,8 @@ const register = async (req, res, next) => {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const hashedPass = await bcrypt.hash(password,10)
+  const hashedPass = await bcrypt.hash(password, 10);
+
   await userService.register(email, hashedPass);
   res.send({ message: 'OK' });
 };
@@ -62,43 +63,82 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await userService.findByEmail(email);
 
-  if (!user ) {
-    throw ApiError.badRequest('No such user')
+  if (!user) {
+    throw ApiError.badRequest('No such user');
   }
-  const isPasswordValid = await bcrypt.compare(password,user.password)
-  if (!isPasswordValid) {
-    throw ApiError.badRequest('Wrong password')
-  }
-  generateTokens(res, user)
 
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+  generateTokens(res, user);
+};
+const refresh = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    throw ApiError.unauthorized();
+  }
+
+  const payload = await jwtService.verifyRefresh(refreshToken);
+
+  if (!payload) {
+    throw ApiError.unauthorized();
+  }
+
+  const tokenRecord = await tokenService.getByToken(refreshToken);
+
+  if (!tokenRecord) {
+    throw ApiError.unauthorized();
+  }
+
+  const { user: payloadUser } = payload;
+
+  const user = await userService.findByEmail(payloadUser.email);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
+
+  generateTokens(res, user);
 };
 
-const refresh = (req, res) => {
-  const { refreshToken } = req.cookies;
-  const user = jwtService.verifyRefresh(refreshToken)
-  if (!user) {
-    throw ApiError.unauthorized()
-  }
-  generateTokens(res, user)
-}
-
-const generateTokens = (res, user) => {
-
+const generateTokens = async (res, user) => {
   const normalizeUser = userService.normalize(user);
   const accessToken = jwtService.sign(normalizeUser);
-  const refreshToken = jwtService.signRefresh(normalizeUser)
-  res.cookie('refreshToken', refreshToken, {
-    maxAge:30*24*60*60*1000,
-    httpOnly: true
-})
+  const refreshAccessToken = jwtService.signRefresh(normalizeUser);
+
+  await tokenService.save(normalizeUser.id, refreshAccessToken);
+
+  res.cookie('refreshToken', refreshAccessToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  });
+
   res.send({
     user: normalizeUser,
     accessToken,
   });
+};
 
-}
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const payload = await jwtService.verifyRefresh(refreshToken);
+
+  if (!refreshToken || !payload) {
+    throw ApiError.unauthorized();
+  }
+
+  await tokenService.remove(payload.user.id);
+  res.clearCookie('refreshToken', { httpOnly: true });
+  res.sendStatus(204);
+};
+
 export const authController = {
   register,
   activate,
-  login,refresh
+  login,
+  refresh,
+  logout,
 };

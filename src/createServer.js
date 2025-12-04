@@ -11,6 +11,7 @@ export function createServer() {
 
   app.use(express.json());
   app.use(cookieParser());
+
   app.use(
     cors({
       origin: process.env.CLIENT_HOST,

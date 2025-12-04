@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 function sign(user) {
   const token = jwt.sign({ user }, process.env.JWT_KEY, {
-    expiresIn:'5s'
+    expiresIn: '15m',
   });
 
   return token;
@@ -34,5 +34,5 @@ export const jwtService = {
   sign,
   verify,
   verifyRefresh,
-  signRefresh
+  signRefresh,
 };
