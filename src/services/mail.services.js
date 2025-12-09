@@ -21,7 +21,7 @@ export function send({ email, subject, html }) {
 
 function sendActivationEmail(name, email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${encodeURIComponent(email)}/${token}`;
-  const html = `<h1> ActivateAcount from ${name} </h1>
+  const html = `<h1> Activate Account from ${name} </h1>
       <a href=${href}> ${href} </a>`;
 
   return send({
@@ -46,7 +46,7 @@ function sendResetEmail(email, token) {
 function sendChangeNewEmail(email, newEmail, token) {
   const href = `${process.env.CLIENT_HOST}/change/${encodeURIComponent(email)}/${token}`;
 
-  const html = `<h2> Reset email for ${email}</h2>
+  const html = `<h2> change of email ${email}</h2>
 <h1> ON ${newEmail}<h1>
       <a href=${href}> ${href} </a>`;
 
@@ -61,7 +61,7 @@ function sendNewEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/confirm/${encodeURIComponent(email)}/${token}`;
 
   const html = `<h2> your new email for login  ${email}</h2>
-<h1> ON ${email}<h1>
+<h1> ON ${email}</h1>
       <a href=${href}> ${href} </a>`;
 
   return send({

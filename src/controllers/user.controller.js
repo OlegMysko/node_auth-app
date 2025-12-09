@@ -60,7 +60,7 @@ const changePassword = async (req, res) => {
   const hashedPass = await bcrypt.hash(newPassword, 10);
 
   user.password = hashedPass;
-  user.save();
+ await user.save();
   res.json({ message: 'Password updated successfully' });
 };
 
@@ -139,6 +139,7 @@ const finallConfirm = async (req, res) => {
   }
   findUser.email = findUser.newEmail;
   findUser.newEmail = null;
+  findUser.activationToken = null;
   await findUser.save();
   res.json('email is active now ');
 };

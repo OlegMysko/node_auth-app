@@ -46,13 +46,13 @@ async function resetPassword(email) {
     throw ApiError.badRequest('sorry');
   }
   findUser.resetToken = resToken;
-  findUser.save();
+  await findUser.save();
   await emailServices.sendResetEmail(email, resToken);
 }
 
 async function confirmReset(password1, password2, resetToken) {
   if (password1 !== password2 || !resetToken) {
-    throw ApiError.badRequest('Password do not mach');
+    throw ApiError.badRequest('Password do not match');
   }
 
   const findUser = await User.findOne({ where: { resetToken } });
@@ -65,7 +65,7 @@ async function confirmReset(password1, password2, resetToken) {
 
   findUser.resetToken = null;
   findUser.password = hashedPass;
-  findUser.save();
+  await findUser.save();
 }
 
 export const userService = {

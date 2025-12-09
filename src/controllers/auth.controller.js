@@ -66,7 +66,7 @@ const activate = async (req, res) => {
   }
   user.activationToken = null;
 
-  user.save();
+  await user.save();
   res.send(user);
 };
 
@@ -87,7 +87,7 @@ const login = async (req, res) => {
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
   }
-  generateTokens(res, user);
+  await generateTokens(res, user);
 };
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
@@ -167,7 +167,7 @@ const resetPassword = async (req, res) => {
 const confirm = async (req, res) => {
   const { password, reppassword, token } = req.body;
 
-  userService.confirmReset(password, reppassword, token);
+  await userService.confirmReset(password, reppassword, token);
   res.sendStatus(204);
 };
 
