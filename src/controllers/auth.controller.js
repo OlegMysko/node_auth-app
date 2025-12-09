@@ -27,21 +27,31 @@ const validatePassword = (value) => {
     return 'At least 6 characters';
   }
 };
+const validateName = (value) => {
+  if (!value) {
+    return 'Name is last';
+  }
+
+  if (value.length < 2) {
+    return 'At least 2 characters';
+  }
+};
 
 const register = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
   const errors = {
+    name: validateName(name),
     email: validateEmail(email),
     password: validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
+  if (errors.email || errors.password || errors.name) {
     throw ApiError.badRequest('Bad request', errors);
   }
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await userService.register(email, hashedPass);
+  await userService.register(name, email, hashedPass);
   res.send({ message: 'OK' });
 };
 
@@ -55,6 +65,7 @@ const activate = async (req, res) => {
     return;
   }
   user.activationToken = null;
+
   user.save();
   res.send(user);
 };
@@ -65,6 +76,10 @@ const login = async (req, res) => {
 
   if (!user) {
     throw ApiError.badRequest('No such user');
+  }
+
+  if (user.activationToken !== null) {
+    throw ApiError.badRequest('you must activated your email check your box');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -135,10 +150,34 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+  const errors = {
+    email: validateEmail(email),
+  };
+
+  if (errors.email) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  await userService.resetPassword(email);
+  res.send({ message: 'email send' });
+};
+
+const confirm = async (req, res) => {
+  const { password, reppassword, token } = req.body;
+
+  userService.confirmReset(password, reppassword, token);
+  res.sendStatus(204);
+};
+
 export const authController = {
   register,
   activate,
   login,
   refresh,
   logout,
+  resetPassword,
+  confirm,
+  validateEmail,
 };

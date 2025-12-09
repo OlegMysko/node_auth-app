@@ -27,5 +27,9 @@ export function createServer() {
   });
   app.use(errorMiddlewares);
 
+  app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Not Found' });
+  });
+
   return app;
 }

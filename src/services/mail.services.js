@@ -19,10 +19,10 @@ export function send({ email, subject, html }) {
   });
 }
 
-function sendActivationEmail(email, token) {
+function sendActivationEmail(name, email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${encodeURIComponent(email)}/${token}`;
-  const html = `< h1 > ActivateAcount </h1>
-      <a href= '${href}'>${href} </a>`;
+  const html = `<h1> ActivateAcount from ${name} </h1>
+      <a href=${href}> ${href} </a>`;
 
   return send({
     email,
@@ -31,4 +31,49 @@ function sendActivationEmail(email, token) {
   });
 }
 
-export const emailServices = { send, sendActivationEmail };
+function sendResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset/${encodeURIComponent(email)}/${token}`;
+  const html = `<h1> Reset password for ${email}</h1>
+      <a href=${href}> ${href} </a>`;
+
+  return send({
+    email,
+    html,
+    subject: 'resetPassword',
+  });
+}
+
+function sendChangeNewEmail(email, newEmail, token) {
+  const href = `${process.env.CLIENT_HOST}/change/${encodeURIComponent(email)}/${token}`;
+
+  const html = `<h2> Reset email for ${email}</h2>
+<h1> ON ${newEmail}<h1>
+      <a href=${href}> ${href} </a>`;
+
+  return send({
+    email,
+    html,
+    subject: 'changeEmail',
+  });
+}
+
+function sendNewEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/confirm/${encodeURIComponent(email)}/${token}`;
+
+  const html = `<h2> your new email for login  ${email}</h2>
+<h1> ON ${email}<h1>
+      <a href=${href}> ${href} </a>`;
+
+  return send({
+    email,
+    html,
+    subject: 'New Email',
+  });
+}
+export const emailServices = {
+  send,
+  sendActivationEmail,
+  sendResetEmail,
+  sendChangeNewEmail,
+  sendNewEmail,
+};
